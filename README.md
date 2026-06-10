@@ -5,10 +5,6 @@ splits it into overlapping chunks, embeds each chunk with a local
 sentence-transformers model, and writes the rows into the Postgres `chunks` table
 (pgvector). Run once, or whenever the source PDF changes.
 
-One of the per-concern repos the pipeline is being split into
-(`backend-`, `engine-`, `indexing-`, `vector-db-rag-context-pipeline`). This repo
-owns the **index-build path and the source document**.
-
 ## Contents
 
 ```
@@ -66,4 +62,4 @@ PyMuPDF4LLM extracts text, tables, and headings well, but discards data labels
 embedded in **charts/figures** (they live in pixels). The net-zero report is
 chart-heavy, so some figures' numbers aren't in the index — recovering them would
 need vision-based extraction. The affected eval questions are flagged
-`"chart_dependent": true` in the umbrella `eval/dataset.jsonl`.
+`"chart_dependent": true` in `engine-rag-context-pipeline/eval/dataset.jsonl`.
