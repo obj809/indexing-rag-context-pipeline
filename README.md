@@ -1,4 +1,4 @@
-# indexing-rag-context-pipeline
+# Indexing RAG Context Pipeline
 
 The indexing pipeline for the [RAG Context Pipeline](../): loads the source PDF,
 splits it into overlapping chunks, embeds each chunk with a local
