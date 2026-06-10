@@ -1,0 +1,8 @@
+pymupdf4llm
+langchain-core
+langchain-text-splitters
+sentence-transformers
+numpy
+python-dotenv
+psycopg[binary]
+pgvector
