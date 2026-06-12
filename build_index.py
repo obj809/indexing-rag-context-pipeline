@@ -29,9 +29,10 @@ EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 
 
 def main() -> None:
-    # Repo-local .env wins; fall back to the umbrella .env during the multi-repo split.
+    # Precedence: real environment > repo-local .env > umbrella .env — an
+    # explicitly set var (e.g. inline DATABASE_URL for a remote build) always wins.
+    load_dotenv(REPO_ROOT / ".env")
     load_dotenv(UMBRELLA / ".env")
-    load_dotenv(REPO_ROOT / ".env", override=True)
     dsn = os.environ["DATABASE_URL"]
 
     print(f"Loading embedding model {EMBEDDING_MODEL}...")
