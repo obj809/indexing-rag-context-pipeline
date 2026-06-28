@@ -1,0 +1,16 @@
+# BuildKit per-Dockerfile ignore.
+#
+# The 1.1 GB .venv is the one that matters: the Dockerfile ends with `COPY . `,
+# so without this the whole venv (plus .git) ships to the daemon and lands in the
+# image. data/ is deliberately NOT excluded — the source PDFs (~4.3 MB) are baked
+# into the image on purpose.
+#
+# Excluding **/.env is hygiene here, not load-bearing: build_index.py uses plain
+# load_dotenv (no override=True), so the compose-injected DATABASE_URL=db:5432
+# already wins over any baked .env. We still drop it to keep the context lean and
+# match the sibling repos.
+**/.venv
+**/.git
+**/__pycache__
+**/.env
+**/*.md
