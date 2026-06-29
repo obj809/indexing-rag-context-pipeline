@@ -17,6 +17,9 @@ build_index.py    # orchestrator: PDFs → chunks → embeddings → Postgres (d
 load_pdf.py       # PDF → per-page Markdown Documents (PyMuPDF4LLM, metadata["page"])
 chunker.py        # Documents → overlapping chunks (RecursiveCharacterTextSplitter)
 embed.py          # chunks → numpy array of embeddings (normalized)
+Dockerfile        # run-on-demand image for the one-shot index build (CPU torch + baked model)
+docker-compose.yml         # `docker compose run --rm indexer` against the vector-db network
+Dockerfile.dockerignore    # keeps .venv/.git/.env out of the build context (data/ is kept on purpose)
 data/
 └── EPBC_Act_1999/
     └── pdf/
@@ -48,6 +51,37 @@ python build_index.py       # first run downloads the ~130MB embedding model
 
 `build_index.py` reads this repo's `.env` first, falling back to the umbrella
 `.env`, so an existing umbrella `.env` keeps it running with no extra setup.
+
+## Run in Docker
+
+Same prerequisite as above (the database container up). The indexer is a
+**run-on-demand one-shot** — it builds the index to completion and exits, so
+there's no `up`:
+
+```bash
+docker compose run --rm indexer    # drop + rebuild the chunks table, then exit
+```
+
+Notes on how the image works:
+
+- This is an **ops tool, not a service**: nothing depends on this image, and it
+  runs `build_index.py` to completion and exits. Its only runtime peer is Postgres.
+- It joins the vector-db repo's Compose network
+  (`vector-db-rag-context-pipeline_default`, an `external` network) to reach
+  Postgres as `db:5432`; `DATABASE_URL` is set in `docker-compose.yml`. It does
+  **not** join `webnet` — the indexer makes no LLM call, so it needs only the
+  database (no OpenAI key either).
+- The source PDFs (`data/EPBC_Act_1999/pdf/`) are copied into the image, so a
+  build is self-contained.
+- The embedding model (`BAAI/bge-small-en-v1.5`) is baked into the image at build
+  time, so the build needs no HuggingFace download at run time. If you change
+  `EMBEDDING_MODEL`, rebuild with `--build-arg EMBEDDING_MODEL=...` (keep it in
+  sync with the constant in `build_index.py`). The torch-install layer is written
+  to match the engine/backend Dockerfiles so the multi-GB layer is shared.
+- `.env` files are deliberately excluded from the image
+  (`Dockerfile.dockerignore`), which also keeps the 1.1 GB `.venv` and `.git` out
+  of the build context; `data/` is kept **in** on purpose so the PDFs ship in the
+  image.
 
 ## Tuning
 
