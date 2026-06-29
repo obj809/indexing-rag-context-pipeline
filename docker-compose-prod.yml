@@ -1,0 +1,25 @@
+# Production compose for the one-shot index build on the VPS. Standalone — run
+# this INSTEAD of docker-compose.yml. It is run-on-demand, NOT a service (no `up`):
+#   docker compose -f docker-compose-prod.yml run --rm indexer
+# It builds the index to completion against the running vector-db, then exits.
+#
+# Differences from dev (docker-compose.yml):
+#   - resource limits for the embedding pass (torch + model + ~2,700 chunks).
+#   - deliberately NO restart policy — a one-shot must never be relaunched.
+# It joins ONLY the vector-db network (no webnet — the indexer makes no LLM call).
+# Prereqs: the vector-db prod stack up; the vector-db network must already exist.
+services:
+  indexer:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://rag:rag@db:5432/rag   # `db` on the vector-db network
+    cpus: 2.0
+    mem_limit: 3g
+    mem_reservation: 512m
+    networks:
+      - vector-db
+
+networks:
+  vector-db:
+    external: true
+    name: vector-db-rag-context-pipeline_default
