@@ -15,9 +15,8 @@ RUN pip install --no-cache-dir torch==2.12.0 --index-url https://download.pytorc
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
-# Bake the embedding model into the image (~130 MB) so the build needs no
-# HuggingFace download at run time. Must match EMBEDDING_MODEL in build_index.py —
-# rebuild with --build-arg if that changes.
+# Bakes the embedding model into the image (~130 MB) so the build needs no
+# HuggingFace download at run time. Must match EMBEDDING_MODEL in build_index.py 
 ARG EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
 RUN python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('$EMBEDDING_MODEL')"
 

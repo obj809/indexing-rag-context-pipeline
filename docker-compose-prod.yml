@@ -6,13 +6,13 @@
 # Differences from dev (docker-compose.yml):
 #   - resource limits for the embedding pass (torch + model + ~2,700 chunks).
 #   - deliberately NO restart policy — a one-shot must never be relaunched.
-# It joins ONLY the vector-db network (no webnet — the indexer makes no LLM call).
+# It joins only the vector-db network
 # Prereqs: the vector-db prod stack up; the vector-db network must already exist.
 services:
   indexer:
     build: .
     environment:
-      DATABASE_URL: postgresql://rag:rag@db:5432/rag   # `db` on the vector-db network
+      DATABASE_URL: postgresql://rag:rag@db:5432/rag
     cpus: 2.0
     mem_limit: 3g
     mem_reservation: 512m

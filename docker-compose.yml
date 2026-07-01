@@ -9,7 +9,7 @@ services:
   indexer:
     build: .
     environment:
-      DATABASE_URL: postgresql://rag:rag@db:5432/rag # `db` = service name on the vector-db network
+      DATABASE_URL: postgresql://rag:rag@db:5432/rag
     networks:
       - vector-db
 

@@ -58,7 +58,7 @@ def main() -> None:
         print(f"Loading {path.name} ({vol})...")
         pages = load_pdf(path)
         for d in pages:
-            d.metadata["volume"] = vol     # rides through chunking into the `volume` column
+            d.metadata["volume"] = vol
         docs.extend(pages)
         print(f"  {len(pages)} pages")
     chunks = chunk_documents(docs, CHUNK_SIZE, CHUNK_OVERLAP)
